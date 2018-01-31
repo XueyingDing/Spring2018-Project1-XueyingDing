@@ -46,7 +46,7 @@ names(date) <- c("Time","President","Term")
 ```
 
 ```{r,warning=FALSE}
-setwd("C:/Users/dingx/Documents/GitHub/Spring2018-Project1-XueyingDing/data/InauguralSpeeches")
+setwd("../data/InauguralSpeeches")
 
 #generate a 'speech.vec1' about speech
 speech.vec1 <- NULL
@@ -89,4 +89,3 @@ mydata <- merge(mydata,speech,by.x = c("File","Term"),by.y = c("President","Term
 mydata$Time <- as.Date(mydata$Time, format="%m/%d/%Y")
 mydata <- mydata[order(mydata$Time),]
 ```
-

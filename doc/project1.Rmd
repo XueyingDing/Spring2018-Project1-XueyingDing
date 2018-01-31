@@ -59,7 +59,7 @@ names(date) <- c("Time","President","Term")
 ```
 
 ```{r,warning=FALSE,include=FALSE}
-setwd("C:/Users/dingx/Documents/GitHub/Spring2018-Project1-XueyingDing/data/InauguralSpeeches")
+setwd("../data/InauguralSpeeches")
 
 #generate a 'speech.vec1' about speech
 speech.vec1 <- NULL
@@ -458,3 +458,7 @@ datatable(FranklinDRoosevelt_1, options = list(pageLength = 5))
 \
 **He does talk about Great Expression! It's so cool to combine data with vivid history events!**
 \
+\
+\
+**resource:http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know**
+**http://www.cbs.dtu.dk/~eklund/beeswarm/**
