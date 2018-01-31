@@ -1,0 +1,201 @@
+---
+title: "word_cloud"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r}
+#install.packages("tm")
+#install.packages("NLP")
+#install.packages("wordcloud")
+#install.packages("RColorBrewer")
+#install.packages("tidytext")
+#install.packages("DT")
+library(tidytext)
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(DT)
+```
+
+#copy an example from the internet
+```{r,warning = FALSE}
+#  "http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know#the-5-main-steps-to-create-word-clouds-in-r"
+# # Load the data as a corpus
+# docs <- Corpus(VectorSource(text))
+# 
+# 
+# #text transformation
+# toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+# docs <- tm_map(docs, toSpace, "/")
+# docs <- tm_map(docs, toSpace, "@")
+# docs <- tm_map(docs, toSpace, "\\|")
+# 
+# #clean the text
+# # Convert the text to lower case
+# docs <- tm_map(docs, content_transformer(tolower))
+# # Remove numbers
+# docs <- tm_map(docs, removeNumbers)
+# # Remove english common stopwords
+# docs <- tm_map(docs, removeWords, stopwords("english"))
+# # Remove your own stop word
+# # specify your stopwords as a character vector
+# docs <- tm_map(docs, removeWords, c("blabla1", "blabla2"))
+# # Remove punctuations
+# docs <- tm_map(docs, removePunctuation)
+# # Eliminate extra white spaces
+# docs <- tm_map(docs, stripWhitespace)
+# # Text stemming
+# docs <- tm_map(docs, stemDocument)
+# 
+# #Build a term-document matrix
+# dtm <- TermDocumentMatrix(docs)
+# m <- as.matrix(dtm)
+# v <- sort(rowSums(m),decreasing=TRUE)
+# d <- data.frame(word = names(v),freq=v)
+# head(d,10)
+# 
+# # #Generate the Word cloud
+# # set.seed(1234)
+# # wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+# #           max.words=200, random.order=FALSE, rot.per=0.35,
+# #           colors=brewer.pal(8, "Dark2"))
+```
+
+#I made above as a function named 'word_cloud'
+```{r}
+word_cloud <- function(article){
+
+docs <- Corpus(VectorSource(article))
+  
+  
+  #text transformation
+  toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+  docs <- tm_map(docs, toSpace, "/")
+  docs <- tm_map(docs, toSpace, "@")
+  docs <- tm_map(docs, toSpace, "\\|")
+  
+  #clean the text
+  # Convert the text to lower case
+  docs <- tm_map(docs, content_transformer(tolower))
+  # Remove numbers
+  docs <- tm_map(docs, removeNumbers)
+  # Remove english common stopwords
+  docs <- tm_map(docs, removeWords, stopwords("english"))
+  # Remove your own stop word
+  # specify your stopwords as a character vector
+  docs <- tm_map(docs, removeWords, c("blabla1", "blabla2"))
+  # Remove punctuations
+  docs <- tm_map(docs, removePunctuation)
+  # Eliminate extra white spaces
+  docs <- tm_map(docs, stripWhitespace)
+  # Text stemming
+  docs <- tm_map(docs, stemDocument)
+  
+  #Build a term-document matrix
+  dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+
+
+#Generate the Word cloud
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35,
+          colors=brewer.pal(8, "BuGn"))
+}
+```
+#I made above as a function named 'top10.word'
+```{r}
+top10.word <- function(article){
+  
+docs <- Corpus(VectorSource(article))
+
+#text transformation
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+docs <- tm_map(docs, toSpace, "/")
+docs <- tm_map(docs, toSpace, "@")
+docs <- tm_map(docs, toSpace, "\\|")
+
+#clean the text
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove numbers
+docs <- tm_map(docs, removeNumbers)
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# Remove your own stop word
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("blabla1", "blabla2"))
+# Remove punctuations
+docs <- tm_map(docs, removePunctuation)
+# Eliminate extra white spaces
+docs <- tm_map(docs, stripWhitespace)
+# Text stemming
+#docs <- tm_map(docs, stemDocument)
+
+#Build a term-document matrix
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+####d <- data.frame(word = names(v),freq=v)
+d <- data.frame(word = names(v))
+return(head(d,10))
+}
+```
+
+
+#(1)make word cloud based on different parties
+```{r,warning = FALSE, fig.height=4, fig.align='center'}
+# par(mfrow=c(3,2))
+# party <- unique(mydata$Party)
+# for(i in 1:length(party)){
+#   mytext <- paste(mydata$Speech[mydata$Party == party[i]],collapse = "")
+#   word_cloud(mytext)
+#   title(main = as.character(party[i]))
+# }
+par(mfrow=c(1,2),mar = c(3, 0, 2, 0))
+party <- unique(mydata$Party)
+
+  mytext <- paste(mydata$Speech[mydata$Party == party[4]],collapse = "")
+  word_cloud(mytext)
+  title(main = as.character(party[4]))
+
+  mytext <- paste(mydata$Speech[mydata$Party == party[6]],collapse = "")
+  word_cloud(mytext)
+  title(main = as.character(party[6]))
+```
+
+#(2)focus on two biggest parties and show how most used words change within years
+```{r}
+#generate data frame 'Democratic.df'
+Time_D <- as.data.frame(mydata$Time[mydata$Party == "Democratic"])
+Speech_D <- as.data.frame(mydata$Speech[mydata$Party == "Democratic"])
+Word_D <- apply(Speech_D,1,top10.word)
+Word_D <- as.data.frame(Word_D)
+Word_D <- t(Word_D)
+Democratic.df <- cbind.data.frame(Time_D,Word_D)
+names(Democratic.df) <- c("Year",1:10)
+rownames(Democratic.df) <- NULL
+
+#generate data frame 'Republican.df'
+Time_R <- as.data.frame(mydata$Time[mydata$Party == "Republican"])
+Speech_R <- as.data.frame(mydata$Speech[mydata$Party == "Republican"])
+Word_R <- apply(Speech_R,1,top10.word)
+Word_R <- as.data.frame(Word_R)
+Word_R <- t(Word_R)
+Republican.df <- cbind.data.frame(Time_R,Word_R)
+names(Republican.df) <- c("Year",1:10)
+rownames(Republican.df) <- NULL
+```
+
+```{r}
+#show
+#"http://www.htmlwidgets.org/showcase_datatables.html"
+datatable(Democratic.df, options = list(pageLength = 5))
+datatable(Republican.df, options = list(pageLength = 5))
+```
+
+

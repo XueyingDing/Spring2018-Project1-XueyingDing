@@ -1,0 +1,92 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#install.packages("xlsx")
+#install.packages("rJava")
+#install.packages("xlsxjars")
+library(rJava)
+library(xlsxjars)
+library(xlsx)
+library(dplyr)
+
+
+
+info <- read.xlsx("../data/InaugurationInfo.xlsx",1)
+date.file <- read.table("../data/InauguationDates.txt", header=F, sep='\t', fill=T)
+
+
+
+#using 'date.file' to generate a 'date.vec1' about time
+date.vec1 <- NULL
+for(i in 2:nrow(date.file)){
+  for(j in 2:ncol(date.file)){
+    date.vec1 <- c(date.vec1,as.character(date.file[i,j]))
+  }
+}
+date.vec1 <- date.vec1[!(date.vec1 == "")]
+#using 'date.file' to generate a 'date.vec2' about president
+date.vec2 <- NULL
+for(i in 2:nrow(date.file)){
+  n <- sum(date.file[i,2:5] != "")
+  date.vec2 <- c(date.vec2,rep(as.character(date.file[i,1]),n))
+}
+#using 'date.file' to generate a 'date.vec3' about term
+date.vec3 <- NULL
+for(i in 2:nrow(date.file)){
+  n <- sum(date.file[i,2:5] != "")
+  date.vec3 <- c(date.vec3,c(1:n))
+}
+#combine 'date.vec1' and 'date.vec2' and 'date.vec3' into 'date'
+date <- cbind(date.vec1,date.vec2,date.vec3)
+date <- as.data.frame(date)
+names(date) <- c("Time","President","Term")
+```
+
+```{r,warning=FALSE}
+setwd("C:/Users/dingx/Documents/GitHub/Spring2018-Project1-XueyingDing/data/InauguralSpeeches")
+
+#generate a 'speech.vec1' about speech
+speech.vec1 <- NULL
+for(i in 1:58){
+  file <- readLines(list.files()[i])
+  file <- paste(file,collapse = "")
+  speech.vec1 <- c(speech.vec1,file)
+}
+#generate a 'speech.vec2' about president
+#generate a 'speech.vec3' about term
+speech.vec2 <- NULL
+speech.vec3 <- NULL
+for(i in 1:58){
+  text.name <- list.files()[i]
+  president <- substring(text.name,6,nchar(text.name)-6)
+  term <- substring(text.name,nchar(text.name)-4,nchar(text.name)-4)
+  term <- as.numeric(term)
+  speech.vec2 <- c(speech.vec2,president)
+  speech.vec3 <- c(speech.vec3,term)
+}
+#combine 'speech.vec1' and 'speech.vec2' and 'speech.vec3' into 'speech'
+speech <- cbind(speech.vec1,speech.vec2,speech.vec3)
+speech <- as.data.frame(speech)
+names(speech) <- c("Speech","President","Term")
+```
+
+```{r}
+speech$Term <- as.numeric(speech$Term)
+speech$President <- as.character(speech$President)
+speech$Speech <- as.character(speech$Speech)
+date$Term <- as.numeric(date$Term)
+date$President <- as.character(date$President)
+info$President <- as.character(info$President)
+
+#combine 'info' and 'date' and 'speech' into a new data frame 'mydata'
+mydata <- info %>%
+        left_join(date,by = c("President","Term"))
+mydata <- merge(mydata,speech,by.x = c("File","Term"),by.y = c("President","Term"))
+#sort 'data' by time
+mydata$Time <- as.Date(mydata$Time, format="%m/%d/%Y")
+mydata <- mydata[order(mydata$Time),]
+```
+

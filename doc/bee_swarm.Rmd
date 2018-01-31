@@ -1,0 +1,184 @@
+---
+title: "bee_swarm"
+output: html_document
+---
+
+```{r}
+#install.packages("beeswarm")
+#install.packages("tokenizers")
+#install.packages("ggplot2")
+#install.packages("plotly")
+#install.packages("qdap")
+#install.packages("syuzhet")
+library(beeswarm)
+library(tokenizers)
+library(ggplot2)
+library(plotly)
+library(DT)
+library(qdap)
+library(syuzhet)
+```
+
+#an example from website
+```{r}
+# data(breast)
+# beeswarm(time_survival ~ event_survival, data = breast,
+#     method = 'swarm',
+#     pch = 16, pwcol = as.numeric(ER),
+#   #   xlab = '', ylab = 'Follow-up time (months)',
+#   #   labels = c('Censored', 'Metastasis'))
+#   # legend('topright', legend = levels(breast$ER),
+#   #   title = 'ER', pch = 16, col = 1:2)
+# )
+```
+
+
+#generating 'sentence.list2'
+```{r, warning=FALSE}
+sentence.list2=NULL
+for(i in 1:nrow(mydata)){
+  sentences=sent_detect(mydata$Speech[i],
+                        endmarks = c("?", ".", "!", "|",";"))
+  if(length(sentences)>0){
+    emotions=get_nrc_sentiment(sentences)
+    word.count=word_count(sentences)
+    # colnames(emotions)=paste0("emo.", colnames(emotions))
+    # in case the word counts are zeros?
+    emotions=diag(1/(word.count+0.01))%*%as.matrix(emotions)
+    sentence.list2 <- rbind(sentence.list2, 
+                        cbind(mydata[i,-ncol(mydata)],
+                              sentences=as.character(sentences), 
+                              word.count,
+                              emotions,
+                              sent.id=1:length(sentences)
+                              )
+    )
+  }
+}
+
+sentence.list2=
+  sentence.list2%>%
+  filter(!is.na(word.count))
+```
+
+#generating 'sentence.list3'
+```{r,warning=FALSE}
+sentence.list3 <- data.frame()
+P.T <- paste(sentence.list2$President,sentence.list2$Term,sep = "")
+P.T <- as.data.frame(P.T)
+sentence.list3<- cbind.data.frame(P.T,sentence.list2$President,
+                                  sentence.list2$word.count,
+                                  as.numeric(as.character(sentence.list2$Words)))
+names(sentence.list3)[2:4] <- c("President","word.count","Words")
+```
+
+
+#using plot to show how many words each president use in each term
+```{r,message=FALSE}
+p <- ggplot(data = sentence.list3, aes(x = President, y = Words, fill = P.T)) +
+              geom_col(position = "dodge") + 
+              theme(axis.text.x = element_blank(),
+                    axis.ticks.x = element_blank())
+ggplotly(p)
+#missing Donald J. Trump because his 'Words' is TBD
+```
+
+
+#beeswarm plot(1)
+```{r}
+#Franklin D. Roosevelt
+FranklinDRoosevelt.df <- sentence.list3[sentence.list3$President 
+                                        == "Franklin D. Roosevelt",c(1:3)]
+FranklinDRoosevelt.df$President <- as.character(FranklinDRoosevelt.df$President)
+FranklinDRoosevelt.df$P.T <- as.factor(as.character(FranklinDRoosevelt.df$P.T))
+#Franklin D. Roosevelt's beeswarm plot
+beeswarm(word.count ~ President, data = FranklinDRoosevelt.df,
+    method = 'swarm',
+    pch = 16, pwcol = as.numeric(P.T) + 4)
+legend('topright', legend = levels(FranklinDRoosevelt.df$P.T),
+           title = 'President Term', pch = 16, col = 5:8,cex = 0.75)
+```
+#beeswarm plot(2)
+```{r}
+#generating data frame about presidents(1) -- Abraham Lincoln
+AbrahamLincoln.df <- sentence.list3[sentence.list3$President 
+                                        == "Abraham Lincoln",c(1:3)]
+AbrahamLincoln.df$President <- as.character(AbrahamLincoln.df$President)
+AbrahamLincoln.df$P.T <- as.factor(as.character(AbrahamLincoln.df$P.T))
+#generating data frame about presidents(2) -- George Washington
+GeorgeWashington.df <- sentence.list3[sentence.list3$President 
+                                        == "George Washington",c(1:3)]
+GeorgeWashington.df$President <- as.character(GeorgeWashington.df$President)
+GeorgeWashington.df$P.T <- as.factor(as.character(GeorgeWashington.df$P.T))
+#generating data frame about presidents(3) -- James Monroe
+JamesMonroe.df <- sentence.list3[sentence.list3$President 
+                                        == "James Monroe",c(1:3)]
+JamesMonroe.df$President <- as.character(JamesMonroe.df$President)
+JamesMonroe.df$P.T <- as.factor(as.character(JamesMonroe.df$P.T))
+#generating data frame about presidents(4) -- William McKinley
+WilliamMcKinley.df <- sentence.list3[sentence.list3$President 
+                                        == "William McKinley",c(1:3)]
+WilliamMcKinley.df$President <- as.character(WilliamMcKinley.df$President)
+WilliamMcKinley.df$P.T <- as.factor(as.character(WilliamMcKinley.df$P.T))
+
+#plot
+par(mfrow = c(1,2))
+#plot(1) -- Abraham Lincoln
+beeswarm(word.count ~ President, data = AbrahamLincoln.df,
+    method = 'swarm',
+    pch = 16, pwcol = as.numeric(P.T) + 4,xlab = '')
+legend('topright', legend = levels(AbrahamLincoln.df$P.T),
+           title = 'President Term', pch = 16, col = 5:6,cex = 0.45)
+#plot(2) -- George Washington
+beeswarm(word.count ~ President, data = GeorgeWashington.df,
+    method = 'swarm',
+    pch = 16, pwcol = as.numeric(P.T) + 4,xlab = '')
+legend('topright', legend = levels(GeorgeWashington.df$P.T),
+           title = 'President Term', pch = 16, col = 5:6,cex = 0.45)
+par(mfrow = c(1,2))
+#plot(3) -- James Monroe
+beeswarm(word.count ~ President, data = JamesMonroe.df,
+    method = 'swarm',
+    pch = 16, pwcol = as.numeric(P.T) + 4,xlab = '')
+legend('topright', legend = levels(JamesMonroe.df$P.T),
+           title = 'President Term', pch = 16, col = 5:6,cex = 0.45)
+#plot(4) -- William McKinley
+beeswarm(word.count ~ President, data = WilliamMcKinley.df,
+    method = 'swarm',
+    pch = 16, pwcol = as.numeric(P.T) + 4,xlab = '')
+legend('topright', legend = levels(WilliamMcKinley.df$P.T),
+           title = 'President Term', pch = 16, col = 5:6,cex = 0.45)
+```
+
+
+#about William Henry Harrison, who has longest speech
+```{r}
+# j1 <- sentence.list2%>%
+#   filter(File=="WilliamHenryHarrison", 
+#          word.count<=10)%>%
+#   select(sentences)
+# datatable(j1, options = list(pageLength = 5))
+#from this result, i can know his sentences usually consist of many words
+# sentence.list2%>%
+#   filter(File=="WilliamHenryHarrison", 
+#          word.count>=20)%>%
+#   select(sentences)
+#15-20 is average words' number of sentence
+j2 <- sentence.list2%>%
+  filter(File=="WilliamHenryHarrison", 
+         word.count>=80)%>%
+  select(sentences)
+datatable(j2, options = list(pageLength = 5))
+#amazing!
+#then i find he also owns the longest sentence in my data
+as.character(sentence.list2[which.max(sentence.list2$word.count),]$sentences)
+#(add some information about this president)
+
+#
+j3 <- sentence.list2%>%
+  filter(File=="DonaldJTrump", 
+         word.count<=10)%>%
+  select(sentences)
+datatable(j3, options = list(pageLength = 5))
+```
+

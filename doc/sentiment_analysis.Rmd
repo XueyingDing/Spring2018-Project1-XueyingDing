@@ -1,0 +1,116 @@
+---
+title: "sentiment_analysis"
+output: html_document
+---
+```{r}
+#install.packages("topicmodels")
+library(topicmodels)
+library(DT)
+```
+
+
+#sentiment
+```{r}
+#analysis sentiment of all speeches using same color theme as in the movie "Inside Out."
+# par(mar=c(4, 6, 2, 1))
+emo.means=colMeans(select(sentence.list2, anger:trust)>0.01)
+col.use=c("red2", "darkgoldenrod1", 
+            "chartreuse3", "blueviolet",
+            "darkgoldenrod2", "dodgerblue3", 
+            "darkgoldenrod1", "darkgoldenrod1")
+barplot(emo.means[order(emo.means)], las=2, col=col.use[order(emo.means)], horiz=T, main="Speeches")
+```
+
+
+#write a function 'f.plotsent.len2'
+```{r}
+f.plotsent.len2 <- function(In.list, InFile, InTerm, President){
+  
+  col.use=c("lightgray", "red2", "darkgoldenrod1", 
+            "chartreuse3", "blueviolet",
+            "darkgoldenrod2", "dodgerblue3", 
+            "darkgoldenrod1", "darkgoldenrod1",
+            "black", "darkgoldenrod2")
+  
+  In.list$topemotion=apply(select(In.list, 
+                                        anger:positive), 
+                                 1, which.max)
+  In.list$topemotion.v=apply(select(In.list,
+                                          anger:positive), 
+                                   1, max)
+  In.list$topemotion[In.list$topemotion.v<0.05]=0
+  In.list$topemotion=In.list$topemotion+1
+  
+  temp=In.list$topemotion.v
+  In.list$topemotion.v[temp<0.05]=1
+  
+  df=In.list%>%filter(File==InFile, Term==InTerm)%>%
+    select(sent.id, word.count, 
+           topemotion, topemotion.v)
+  
+  ptcol.use=alpha(col.use[df$topemotion], sqrt(sqrt(df$topemotion.v)))
+  
+  plot(df$sent.id, df$word.count, 
+       col=ptcol.use,
+       type="h", #ylim=c(-10, max(In.list$word.count)),
+       main=President)
+}
+```
+#using 'f.plotsent.len2' function
+```{r}
+#before and after the great depression
+par(mfrow = c(2,1))
+f.plotsent.len2(In.list = sentence.list2, InFile = "HerbertHoover", 
+                InTerm = 1, President = "Herbert Hoover")
+f.plotsent.len2(In.list = sentence.list2, InFile = "FranklinDRoosevelt", 
+                InTerm = 1, President = "Franklin D. Roosevelt")
+
+
+# #before and after 9.11
+# par(mfrow = c(2,1))
+# f.plotsent.len2(In.list = sentence.list2, InFile = "GeorgeWBush", 
+#                 InTerm = 1, President = "George W. Bush")
+# f.plotsent.len2(In.list = sentence.list2, InFile = "GeorgeWBush", 
+#                 InTerm = 2, President = "George W. Bush")
+```
+
+#what are these sentences
+```{r}
+# speech.df=tbl_df(sentence.list2)%>%
+#   filter(File=="HerbertHoover", Term ==1, word.count>=5)%>%
+#   select(sentences, c(anger:positive))
+# speech.df=as.data.frame(speech.df)
+# HerbertHoover_1 <- as.character(speech.df$sentences[apply(speech.df[,-1], 2, which.max)])
+# HerbertHoover_1 <- as.data.frame(HerbertHoover_1)
+# datatable(HerbertHoover_1, options = list(pageLength = 5))
+
+speech.df=tbl_df(sentence.list2)%>%
+  filter(File=="FranklinDRoosevelt", Term ==1, word.count>=5)%>%
+  select(sentences, c(anger:positive))
+speech.df=as.data.frame(speech.df)
+FranklinDRoosevelt_1 <- as.character(speech.df$sentences[apply(speech.df[,-1], 2, which.max)])
+FranklinDRoosevelt_1 <- as.data.frame(FranklinDRoosevelt_1)
+datatable(FranklinDRoosevelt_1, options = list(pageLength = 5))
+
+
+
+# 
+# speech.df=tbl_df(sentence.list2)%>%
+#   filter(File=="GeorgeWBush", Term ==1, word.count>=5)%>%
+#   select(sentences, c(anger:positive))
+# speech.df=as.data.frame(speech.df)
+# as.character(speech.df$sentences[apply(speech.df[,-1], 2, which.max)])
+# GeorgeWBush_1 <- as.character(speech.df$sentences[apply(speech.df[,-1], 2, which.max)])
+# GeorgeWBush_1 <- as.data.frame(GeorgeWBush_1)
+# datatable(GeorgeWBush_1, options = list(pageLength = 5))
+# 
+# 
+# speech.df=tbl_df(sentence.list2)%>%
+#   filter(File=="GeorgeWBush", Term ==2, word.count>=5)%>%
+#   select(sentences, c(anger:positive))
+# speech.df=as.data.frame(speech.df)
+# as.character(speech.df$sentences[apply(speech.df[,-1], 2, which.max)])
+# GeorgeWBush_2 <- as.character(speech.df$sentences[apply(speech.df[,-1], 2, which.max)])
+# GeorgeWBush_2 <- as.data.frame(GeorgeWBush_2)
+# datatable(GeorgeWBush_2, options = list(pageLength = 5))
+```
