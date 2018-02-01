@@ -46,12 +46,14 @@ names(date) <- c("Time","President","Term")
 ```
 
 ```{r,warning=FALSE}
-setwd("../data/InauguralSpeeches")
+#setwd("../data/InauguralSpeeches")
 
 #generate a 'speech.vec1' about speech
 speech.vec1 <- NULL
 for(i in 1:58){
-  file <- readLines(list.files()[i])
+  name_txt <- list.files(path = "../data/InauguralSpeeches")[i]
+  name_full <- paste0("../data/InauguralSpeeches/", name_txt)
+  file <- readLines(name_full)
   file <- paste(file,collapse = "")
   speech.vec1 <- c(speech.vec1,file)
 }
@@ -60,7 +62,7 @@ for(i in 1:58){
 speech.vec2 <- NULL
 speech.vec3 <- NULL
 for(i in 1:58){
-  text.name <- list.files()[i]
+  text.name <- list.files("../data/InauguralSpeeches")[i]
   president <- substring(text.name,6,nchar(text.name)-6)
   term <- substring(text.name,nchar(text.name)-4,nchar(text.name)-4)
   term <- as.numeric(term)
