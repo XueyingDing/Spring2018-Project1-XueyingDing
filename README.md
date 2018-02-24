@@ -11,7 +11,7 @@ Term: Spring 2018
 + Projec title: 
 + This project is conducted by Xueying Ding
 
-+ Project summary: https://cdn.rawgit.com/TZstatsADS/Spring2018-Project1-XueyingDing/7b058860/doc/final_report.html.
++ Project summary: You can view result by clicking this: https://cdn.rawgit.com/TZstatsADS/Spring2018-Project1-XueyingDing/7b058860/doc/final_report.html.
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
