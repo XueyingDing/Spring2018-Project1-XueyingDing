@@ -88,7 +88,7 @@ mydata <- mydata[order(mydata$Time),]
 ```
 \
 \
-**Have you ever been curious about what presidents usually say on their inauguration? Which words they use most frequently? How long the speeches are? What are emotions conveyed by these speeches? Will presidents change their speeches' style between several terms? Well, today we have chance to find out some of your questions! Based on 58 speeches given by 40 USA presidents in history, we will explore fun facts within it.**
+**Have you ever been curious about what presidents usually say on their inaugurations? Which words they use most frequently? How long the speeches are? What are emotions conveyed by these speeches? Will presidents change their speeches' style between several terms? Well, today we have chance to find out some of your questions! Based on 58 speeches given by 40 USA presidents in history, we will explore fun facts within it.**
 
 **Let's get started! **
 
@@ -299,7 +299,7 @@ ggplotly(p)
 \
 **Now move your mouse, you can check whatever you want! **
 
-**We notice that some presidents give speeches of very different length in their several terms. Do they change their writing style during terms? Let's do more research on how they use words.**
+**We notice that some presidents give speeches of very different length in their several terms. Do they change their writing style during terms? Let's do more researches on how they use words.**
 
 **First, we want to inspect President Franklin D. Roosevelt. He is the only one who has 4 terms!**
 ```{r,message=FALSE,echo=FALSE,fig.align='center'}
@@ -367,7 +367,7 @@ beeswarm(word.count ~ President, data = WilliamMcKinley.df,
 legend('topright', legend = levels(WilliamMcKinley.df$P.T),
            title = 'President Term', pch = 16, col = 5:6,cex = 0.45)
 ```
-**It's clear that Abraham Lincoln's speech length change much while George Washington's words using style change much.**
+**It's clear that Abraham Lincoln's speech length changes much while George Washington's words using style changes much.**
 \
 **We are also attracted to highest bar in former bar chart -- William Henry Harrison. Why his speech has so many words? Generally speaking, sentence consist of 10-15 words but below we can show you his sentences consist of more than 80 words, which are super super long.**
 
